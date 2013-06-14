@@ -1,0 +1,48 @@
+{% extends base_template %}
+
+{% block content %}
+    <h3>{{ title }}</h3>
+    {% if code == 404 %}
+
+        <h4>
+            We couldn't find the page you requested.
+        </h4>
+        <p>
+            Page not found
+        </p>
+
+    {% elif code == 403 %}
+
+        <h4>
+            The page you are trying to access is not accessible.
+        </h4>
+        <p>
+            Insufficient previlege
+        </p>
+
+    {% elif code == 500 %}
+
+        <h4>
+            Something went wrong with the server.
+        </h4>
+        <p>
+            Message Here
+        </p>
+
+    {% elif code == 429 %}
+        <h4>
+            Too many request in short amount of time.
+        </h4>
+        <p>
+            Message here
+        </p>
+    {% endif %}
+
+    {% if is_dev and exception %}
+        <pre>
+            <h4>Dev Error</h4>
+            {{ exception }}
+        </pre>
+    {% endif %}
+
+{% endblock %}

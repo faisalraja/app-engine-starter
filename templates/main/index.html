@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>
+    App Engine Starter
+</h1>
+<p>
+    Create quick prototypes or use for production.
+</p>
+
+<p>
+    To start at baseline, remove the following:
+</p>
+<ul>
+    <li>templates/base.html before body, there is comments on which to remove</li>
+    <li>navigation links on base.html</li>
+    <li>app.yaml endpoints handler</li>
+    <li>routes.py rpc handler</li>
+    <li>models/models.py has a Shout model</li>
+    <li>That's it, you should be able to create anything from those demo too.</li>
+</ul>
+
+<div class="row">
+    <div class="span6">
+        <h4>Shouts</h4>
+        {% for shout in shouts %}
+        <blockquote>
+            <p>{{ shout.message }}</p>
+            <p class="pull-right muted">{{ shout.user_id }}</p>
+        </blockquote>
+        {% endfor %}
+        {% if more %}
+            <ul class="pager">
+              <li><a href="{{ uri_for('home', more=more) }}">More</a></li>
+            </ul>
+        {% endif %}
+    </div>
+    <div class="span6">
+        <form method="post">
+            <fieldset>
+                <legend>Shout</legend>
+                <label for="message"></label>
+                <textarea rows=3 name="message" id="message"></textarea>
+                <p>
+                {% if user_id %}
+                    <input type="submit" class="btn btn-primary" value="Shout Out" />
+                {%  else %}
+                    <a href="{{ uri_for('user-login') }}" class="btn btn-warning">Sign in to shout</a>
+                {% endif %}
+                </p>
+            </fieldset>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+

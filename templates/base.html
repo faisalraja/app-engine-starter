@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>App Engine Starter</title>
+    {# Replace your logos, this is so no 404's are generated #}
+    <link rel="apple-touch-icon" href="{{ static_url(1) }}/img/logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+
+    <!-- Le styles -->
+    <link href="{{ static_url(1) }}/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 60px;
+        }
+    </style>
+    <link href="{{ static_url(2) }}/css/bootstrap-responsive.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="{{ uri_for('home') }}">App Engine Starter</a>
+            <div class="nav-collapse collapse">
+                <ul class="nav">
+                    <li class="active"><a href="/">Home</a></li>
+                    <li><a href="{{ uri_for('admin-home') }}">Admin</a></li>
+                    <!-- Api & Web Services Demo -->
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            JSONRPC Demo
+                            <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" class="rpc-btn" data-method="login">Login with OAuth</a></li>
+                            <li><a href="#" class="rpc-btn" data-method="is_logged_in">Check if logged in</a></li>
+                            <li><a href="#" class="rpc-btn" data-method="logout">Logout</a></li>
+                            <li><a href="#" class="rpc-btn" data-method="hello" data-params='{"world": "Test", "limit": 20}'>Named Params</a></li>
+                            <li><a href="#" class="rpc-btn" data-method="hello" data-params='["Test", 2]'>Positional Params</a></li>
+                            <li><a href="#" class="batch-btn">Batch Requests</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            Cloud Endpoints Demo
+                            <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" class="endpoints-btn" data-method="login">Login with OAuth</a></li>
+                            <li><a href="#" class="endpoints-btn" data-method="get_email">Get email</a></li>
+                            <li><a href="#" class="endpoints-btn" data-method="hello" data-params='{world:"Test", limit: 20}'>Hello List</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- End Services Demo -->
+                </ul>
+            </div><!--/.nav-collapse -->
+
+            <div class="nav-collapse pull-right">
+                <ul class="nav">
+                    {% if user_id %}
+                        <li><a href="{{ uri_for('user-logout') }}">Logout</a></li>
+                    {% else %}
+                        <li><a href="{{ uri_for('user-login') }}">Login</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="main-container" class="container">
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message[1] }}">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          {{ message[0]|safe }}
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</div> <!-- /container -->
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="{{ static_url(3) }}/js/bootstrap.min.js"></script>
+
+{# todo remove this part since it's just a demo #}
+    <script type="text/javascript">
+        var rpcEndpoint = '{{ uri_for('rpc') }}',
+            client_id = '{{ endpoints_client_id }}';
+    </script>
+    <script src="{{ static_url(3) }}/js/demo.js"></script>
+    <script src="https://apis.google.com/js/client.js?onload=init"></script>
+{# todo end remove demo part#}
+</body>
+</html>
