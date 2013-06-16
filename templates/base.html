@@ -9,13 +9,11 @@
     <meta name="description" content="">
 
     <!-- Le styles -->
-    <link href="{{ static_url(1) }}/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            padding-top: 60px;
-        }
-    </style>
-    <link href="{{ static_url(2) }}/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.min.css" rel="stylesheet">
+    {# static_url method helps you with automatic cookieless domain using the version of your app #}
+    {# parameter 1 helps you divide the loading into different subdomain #}
+    <link href="{{ static_url(1) }}/css/style.css" rel="stylesheet">
 </head>
 
 <body>
@@ -91,15 +89,15 @@
     {% block content %}{% endblock %}
 </div> <!-- /container -->
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script src="{{ static_url(3) }}/js/bootstrap.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
 
 {# todo remove this part since it's just a demo #}
     <script type="text/javascript">
         var rpcEndpoint = '{{ uri_for('rpc') }}',
             client_id = '{{ endpoints_client_id }}';
     </script>
-    <script src="{{ static_url(3) }}/js/demo.js"></script>
+    <script src="{{ static_url(2) }}/js/demo.js"></script>
     <script src="https://apis.google.com/js/client.js?onload=init"></script>
 {# todo end remove demo part#}
 </body>
