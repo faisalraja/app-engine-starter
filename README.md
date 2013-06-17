@@ -13,6 +13,7 @@ Summary of things::
     static/ - js/css/images and all other static files (templates for js html)
     templates/ - jinja2 templates goes here
     web/ - webpage handlers
+    tests/ - unit testing tests goes here
     config.py - any configurable things on your project to easily edit later when you adjust things
     routes.py - all your routing needs for your url mapping to webpage handlers
 

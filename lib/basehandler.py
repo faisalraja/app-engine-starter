@@ -14,12 +14,12 @@ from webapp2_extras import sessions
 # Initialize constants & stuff for static files
 from lib import jsonrpc
 
-VERSION_ID = os.environ.get('CURRENT_VERSION_ID', 'v1.0').split('.')
+VERSION_ID = os.environ.get('CURRENT_VERSION_ID', '1.1').split('.')
 VERSION = VERSION_ID[0]
 APP_VERSION = int(VERSION_ID[1])
 APP_ID = app_identity.get_application_id()
 
-IS_DEV = os.environ['SERVER_SOFTWARE'].startswith('Dev')
+IS_DEV = os.environ.get('SERVER_SOFTWARE', 'Development/%s' % VERSION_ID).startswith('Dev')
 IS_BACKEND = backends.get_backend() is not None
 
 # Bot user agents
@@ -103,7 +103,8 @@ class BaseHandler(webapp2.RequestHandler):
 
     def _is_restricted(self):
         # restric appspot domains or staging and duplicate contents
-        if self.request.path in ('/sample-allowed-path/here', '/sample/2'):
+        if self.request.path in ('/sample-allowed-path/here',):
+            # Useful for testing thirdparty callbacks
             pass
         elif self.request.host.endswith('.appspot.com') and \
                 not self.request.headers.get('X-AppEngine-Cron') and \
