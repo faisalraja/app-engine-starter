@@ -8,13 +8,11 @@ __author__ = 'faisal'
 class Shout(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
     message = ndb.TextProperty()
-    # Since this is just a demo you should implement
-    # your user stuff your way
-    user_id = ndb.StringProperty()
+    name = ndb.TextProperty()
 
     @classmethod
-    def post(cls, message, user_id):
-        shout = cls(message=message, user_id=user_id)
+    def post(cls, message, name):
+        shout = cls(message=message, name=name)
         shout.put()
         return shout
 

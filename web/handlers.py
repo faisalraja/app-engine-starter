@@ -15,7 +15,7 @@ class HomeHandler(BaseHandler):
         elif not self.user_id:
             self.add_message('Please login')
         else:
-            models.Shout.post(message, self.user_id)
+            models.Shout.post(message, self.request.get('name', 'Anonymous'))
 
         # Redirects to home when done
         return self.redirect_to('home')
