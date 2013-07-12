@@ -10,21 +10,13 @@ threadsafe: yes
 default_expiration: "30d"
 
 skip_files:
-- ^(.*/)?app\.yaml
-- ^(.*/)?app\.yml
-- ^(.*/)?index\.yaml
-- ^(.*/)?index\.yml
 - ^(.*/)?#.*#
 - ^(.*/)?.*~
 - ^(.*/)?.*\.py[co]
-- ^(.*/)?.*/RCS/.*
 - ^(.*/)?\..*
 - ^(.*/)?tests$
-- ^(.*/)?test$
-- Makefile
 - \.svn
 - ^\.svn/.*
-- \.*\.lint$
 
 
 builtins:
@@ -37,21 +29,13 @@ handlers:
   static_files: static/\1
   upload: static/(robots\.txt|humans\.txt|crossdomain\.xml)
 
-- url: /img/(.*\.(gif|png|jpg))
-  static_files: static/img/\1
-  upload: static/img/(.*\.(gif|png|jpg))
-
 - url: /favicon\.ico
   static_files: static/favicon.ico
   upload: static/favicon\.ico
 
-- url: /css
-  mime_type: text/css
-  static_dir: static/css
-
-- url: /js
-  mime_type: text/javascript
-  static_dir: static/js
+- url: /(js|css|img)/(.*)
+  static_files: static/\1/\2
+  upload: static/(js|css|img)/.*
 
 # Endpoints handler (in services/__init__.py)
 - url: /_ah/spi/.*
