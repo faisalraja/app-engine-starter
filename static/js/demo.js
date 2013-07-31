@@ -70,6 +70,10 @@ $('a.endpoints-btn').click(function(e){
         gapi.client.demo.user.email().execute(function(resp){
             $('#main-container').prepend('<div class="alert alert-success">Response: ' + JSON.stringify(resp) + '</div>');
         });
+    } else if (method == 'delete_shouts') {
+        gapi.client.demo.mappers.deleteShouts().execute(function(resp){
+            $('#main-container').prepend('<div class="alert alert-success">Response: ' + JSON.stringify(resp) + '</div>');
+        });
     }
 });
 

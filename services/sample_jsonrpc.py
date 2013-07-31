@@ -2,6 +2,8 @@ import logging
 from google.appengine.api import oauth
 from google.appengine.api.oauth import NotAllowedError
 from lib.basehandler import RpcHandler
+from google.appengine.ext import deferred
+from mappers import demo
 
 ERROR_LOGIN = 'Login Error'
 TYPE_ERROR = 'error'
@@ -44,3 +46,9 @@ class ApiHandler(RpcHandler):
     def hello(self, world, limit=1):
 
         return [world for i in range(limit)]
+
+    def delete_shouts(self):
+
+        # This sample runs it in the mappers backend, with 100 batches, the more things you do in map
+        # the smaller the batch should be to avoid duplicate runs on failures
+        deferred.defer(demo.DeleteAllShout().run, 100, _target='mappers')

@@ -10,6 +10,7 @@ Summary of things::
     lib/ - will hold your custom libraries, thirdparty libraries usually just go on root folder
     models/ - all your endpoint messages and datastore models here
     services/ - web services like cloud endpoints or your custom jsonrpc services
+    mappers/ - model long tasks goes here for scripting or any task like actions
     static/ - js/css/images and all other static files (templates for js html)
     templates/ - jinja2 templates goes here
     web/ - webpage handlers
