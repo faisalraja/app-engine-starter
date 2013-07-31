@@ -30,11 +30,15 @@
             <p class="pull-right muted">{{ shout.name }}</p>
         </blockquote>
         {% endfor %}
-        {% if more %}
-            <ul class="pager">
-              <li><a href="{{ uri_for('home', more=more) }}">More</a></li>
-            </ul>
+
+        <ul class="pager">
+        {% if prev %}
+              <li><a href="{{ uri_for('home', more=prev, prev=True) }}">Previous</a></li>
         {% endif %}
+        {% if more %}
+              <li><a href="{{ uri_for('home', more=more) }}">Next</a></li>
+        {% endif %}
+        </ul>
     </div>
     <div class="span6">
         <form method="post">

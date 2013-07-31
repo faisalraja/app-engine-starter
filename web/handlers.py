@@ -1,9 +1,9 @@
 from google.appengine.api import users
 from lib.basehandler import BaseHandler
+from models import models
 
 
 # Check routes.py to see hot everything is routed here
-from models import models
 
 
 class HomeHandler(BaseHandler):
@@ -22,11 +22,23 @@ class HomeHandler(BaseHandler):
 
     def get(self):
         # Gets list of shouts
+        current_cursor = self.request.get('more')
+        is_prev = self.request.get('prev', False)
+
         # Remember that queries aren't cached, refer to my blog on query caching tips
-        result, cursor, more = models.Shout.list(self.request.get('more'))
+        result, cursor, more = models.Shout.list(current_cursor, is_prev)
+
+        if is_prev:
+            prev = cursor.reversed().urlsafe() if more else None
+            next = current_cursor
+        else:
+            prev = current_cursor
+            next = cursor.urlsafe() if more else None
+
         params = {
             'shouts': result,
-            'more': cursor.urlsafe() if more else ''
+            'prev': prev if prev else '',
+            'more': next if next else ''
         }
         return self.render_template('main/index.html', **params)
 

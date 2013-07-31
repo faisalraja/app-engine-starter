@@ -1,3 +1,4 @@
+import logging
 from google.appengine.ext import ndb
 
 __author__ = 'faisal'
@@ -17,10 +18,18 @@ class Shout(ndb.Model):
         return shout
 
     @classmethod
-    def list(cls, more_cursor=None):
+    def list(cls, more_cursor=None, is_reverse=False):
         qry = cls.query().order(-cls.created)
+
+        cursor = ndb.Cursor(urlsafe=more_cursor)
+
+        # Pagination previous
+        if is_reverse:
+            qry = cls.query().order(cls.created)
+            cursor = cursor.reversed()
+
         # Limit, Start Cursor
         # You can read on my blog on how to handle
         # loading user ids to name asynchronously
         # since you will save your user data differently its simply showing ids
-        return qry.fetch_page(5, start_cursor=None if not more_cursor else ndb.Cursor(urlsafe=more_cursor))
+        return qry.fetch_page(5, start_cursor=None if not more_cursor else cursor)

@@ -9,10 +9,9 @@ from google.appengine.api import users, app_identity, backends, memcache
 from google.appengine.ext import ndb
 from webapp2_extras import jinja2
 from webapp2_extras import sessions
-
+from lib import jsonrpc
 
 # Initialize constants & stuff for static files
-from lib import jsonrpc
 
 VERSION_ID = os.environ.get('CURRENT_VERSION_ID', '1.1').split('.')
 VERSION = VERSION_ID[0]
