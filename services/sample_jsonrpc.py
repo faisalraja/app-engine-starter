@@ -3,6 +3,7 @@ from google.appengine.api import oauth
 from google.appengine.api.oauth import NotAllowedError
 from lib.basehandler import RpcHandler
 from google.appengine.ext import deferred
+from lib.jsonrpc import ServerException
 from mappers import demo
 
 ERROR_LOGIN = 'Login Error'
@@ -52,3 +53,7 @@ class ApiHandler(RpcHandler):
         # This sample runs it in the mappers backend, with 100 batches, the more things you do in map
         # the smaller the batch should be to avoid duplicate runs on failures
         deferred.defer(demo.DeleteAllShout().run, 100, _target='mappers')
+
+    def sample_error(self):
+        # this is good for any types of errors
+        raise ServerException('Just a sample error')

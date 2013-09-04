@@ -16,6 +16,7 @@ skip_files:
 - ^(.*/)?\..*
 - ^(.*/)?tests$
 - \.svn
+- \.git
 - ^\.svn/.*
 
 
