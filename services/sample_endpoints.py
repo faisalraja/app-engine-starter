@@ -1,7 +1,8 @@
 import logging
+import endpoints
 from google.appengine.api import oauth
 from google.appengine.api.oauth import NotAllowedError
-from google.appengine.ext import endpoints, deferred
+from google.appengine.ext import deferred
 from protorpc import remote, message_types
 import config
 from mappers import demo

@@ -18,8 +18,7 @@ class AppTest(unittest.TestCase):
         self.testbed.init_all_stubs()
 
         import main
-        # todo figure out how to get it properly on ndb.toplevel
-        self.app = webtest.TestApp(main.app.__dict__['__wrapped__'])
+        self.app = webtest.TestApp(getattr(main.app, '__wrapped__'))
 
     def tearDown(self):
         self.testbed.deactivate()

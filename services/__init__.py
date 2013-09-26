@@ -1,4 +1,4 @@
-from google.appengine.ext import endpoints
+import endpoints
 from services.sample_endpoints import ApiService
 
 __author__ = 'faisal'
