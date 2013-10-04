@@ -26,13 +26,9 @@ builtins:
 - deferred: on
 
 handlers:
-- url: /(robots\.txt|humans\.txt|crossdomain\.xml)
+- url: /(robots\.txt|humans\.txt|crossdomain\.xml|favicon\.ico)
   static_files: static/\1
-  upload: static/(robots\.txt|humans\.txt|crossdomain\.xml)
-
-- url: /favicon\.ico
-  static_files: static/favicon.ico
-  upload: static/favicon\.ico
+  upload: static/(robots\.txt|humans\.txt|crossdomain\.xml|favicon\.ico)
 
 - url: /(js|css|img)/(.*)
   static_files: static/\1/\2
