@@ -1,5 +1,4 @@
 import datetime
-from google.appengine.api import memcache
 import logging
 
 __author__ = 'faisal'
@@ -9,28 +8,28 @@ from google.appengine.runtime import DeadlineExceededError
 
 
 class Mapper(object):
-    prefix_key = 'mapper_'
 
     def __init__(self, use_cache=False):
         ndb.get_context().set_cache_policy(use_cache)
         if not use_cache:
             ndb.get_context().clear_cache()
 
-        self.KIND = None
+        self.kind = None
         self.to_put = []
         self.to_delete = []
         self.terminate = False
         # Data you wanna carry on in case of error
-        self.DATA = None
+        self.data = None
         # Temporary Data that won't carry on in case of error
-        self.TMP_DATA = None
-        self.FILTERS = []
-        self.ORDERS = []
+        self.tmp_data = None
+        self.filters = []
+        self.orders = []
+        self.keys_only = False
         # implement init for different initializations
         self.init()
 
     def delete(self, entity):
-        self.to_delete.append(entity.key)
+        self.to_delete.append(entity if isinstance(entity, ndb.Key) else entity.key)
 
     def update(self, entity):
         self.to_put.append(entity)
@@ -55,17 +54,17 @@ class Mapper(object):
 
     def get_query(self):
         """Returns a query over the specified kind, with any appropriate filters applied."""
-        q = self.KIND.query()
-        for filter in self.FILTERS:
+        q = self.kind.query()
+        for filter in self.filters:
             q = q.filter(filter)
-        for order in self.ORDERS:
+        for order in self.orders:
             q = q.order(order)
 
         return q
 
     def run(self, batch_size=100, initial_data=None):
         if initial_data is None:
-            initial_data = self.DATA
+            initial_data = self.data
         """Starts the mapper running."""
         if hasattr(self, '_pre_run_hook'):
             getattr(self, '_pre_run_hook')()
@@ -82,19 +81,14 @@ class Mapper(object):
             del self.to_delete[:]
 
     def _continue(self, cursor, batch_size, data):
-        self.DATA = data
+        self.data = data
         q = self.get_query()
         if q is None:
             self.finish()
             return
         # If we're resuming, pick up where we left off last time.
-        iter = q.iter(produce_cursors=True, start_cursor=cursor)
-        # Keep updating records until we run out of time.
-        cache_id = self.prefix_key + self.__class__.__name__
+        iter = q.iter(produce_cursors=True, start_cursor=cursor, keys_only=self.keys_only)
         try:
-            # create a 10 minute cache
-            start_time = datetime.datetime.now()
-            memcache.set(cache_id, start_time, 60 * 10)
             # Steps over the results, returning each entity and its index.
             i = 0
             while iter.has_next():
@@ -104,10 +98,6 @@ class Mapper(object):
                 if (i + 1) % batch_size == 0:
                     # Record the last entity we processed.
                     self._batch_write()
-                    # check if time has expired
-                    if (datetime.datetime.now() - start_time).seconds > 60 * 10:
-                        start_time = datetime.datetime.now()
-                        memcache.set(cache_id, start_time, 60 * 10)
                 i += 1
                 if self.terminate:
                     break
@@ -118,8 +108,7 @@ class Mapper(object):
             self._batch_write()
             self.deadline_error()
             # Queue a new task to pick up where we left off.
-            deferred.defer(self._continue, iter.cursor_after(), batch_size, self.DATA)
+            deferred.defer(self._continue, iter.cursor_after(), batch_size, self.data)
             logging.error(self.__class__.__name__ + ' DeadlineExceedError')
             return
         self.finish()
-        memcache.delete(cache_id)

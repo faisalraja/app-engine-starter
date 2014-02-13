@@ -14,8 +14,8 @@ __author__ = 'faisal'
 class DeleteOldShout(Mapper):
 
     def init(self):
-        self.KIND = models.Shout
-        self.FILTERS = [models.Shout.created < datetime.datetime.now() - datetime.timedelta(days=15)]
+        self.kind = models.Shout
+        self.filters = [models.Shout.created < datetime.datetime.now() - datetime.timedelta(days=15)]
 
     def map(self, shout):
 
@@ -27,7 +27,7 @@ class DeleteOldShout(Mapper):
 class DeleteAllShout(Mapper):
 
     def init(self):
-        self.KIND = models.Shout
+        self.kind = models.Shout
 
     def map(self, shout):
 
