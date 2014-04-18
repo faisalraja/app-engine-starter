@@ -1,8 +1,13 @@
 application: app-engine-starter
+module: default
 version: 1
 runtime: python27
 api_version: 1
 threadsafe: yes
+
+automatic_scaling:
+  max_idle_instances: 1
+  min_pending_latency: 15.0s
 
 # The reason you can keep this is because of the static_url method
 # which uses unique id from the app to refresh cache on each deploy
@@ -10,15 +15,12 @@ threadsafe: yes
 default_expiration: "30d"
 
 skip_files:
-- ^(.*/)?#.*#
-- ^(.*/)?.*~
-- ^(.*/)?.*\.py[co]
-- ^(.*/)?\..*
+- ^(.*/)?#.*#$
+- ^(.*/)?.*~$
+- ^(.*/)?.*\.py[co]$
+- ^(.*/)?.*/RCS/.*$
+- ^(.*/)?\..*$
 - ^(.*/)?tests$
-- \.svn
-- \.git
-- ^\.svn/.*
-
 
 builtins:
 - appstats: off #/_ah/stats/

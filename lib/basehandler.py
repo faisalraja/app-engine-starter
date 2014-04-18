@@ -5,7 +5,7 @@ import hashlib
 import webapp2
 import config
 from datetime import datetime
-from google.appengine.api import users, app_identity, backends, memcache
+from google.appengine.api import users, app_identity, memcache
 from google.appengine.ext import ndb
 from webapp2_extras import jinja2
 from webapp2_extras import sessions
@@ -19,7 +19,6 @@ APP_VERSION = int(VERSION_ID[1])
 APP_ID = app_identity.get_application_id()
 
 IS_DEV = os.environ.get('SERVER_SOFTWARE', 'Development/%s' % VERSION_ID).startswith('Dev')
-IS_BACKEND = backends.get_backend() is not None
 
 # Bot user agents
 BOT_USER_AGENTS = [
@@ -102,7 +101,7 @@ class BaseHandler(webapp2.RequestHandler):
 
     def _is_restricted(self):
         # restric appspot domains or staging and duplicate contents
-        if self.request.path in ('/sample-allowed-path/here',):
+        if self.request.path in ('/sample-allowed-path/here',) or self.request.path.startswith('/_ah/'):
             # Useful for testing thirdparty callbacks
             pass
         elif self.request.host.endswith('.appspot.com') and \
@@ -178,7 +177,7 @@ class BaseHandler(webapp2.RequestHandler):
             return 'http://%s' % '.'.join([
                 str(num),
                 str(APP_VERSION),
-                VERSION if not IS_BACKEND else 'cdn',
+                VERSION,
                 app_identity.get_default_version_hostname()
             ])
 

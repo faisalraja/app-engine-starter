@@ -40,6 +40,6 @@ class ApiService(remote.Service):
 
         # This sample runs it in the mappers backend, with 100 batches, the more things you do in map
         # the smaller the batch should be to avoid duplicate runs on failures
-        deferred.defer(demo.DeleteAllShout().run, 100, _target='mappers')
+        deferred.defer(demo.DeleteAllShout().run, 100)
 
         return message_types.VoidMessage()

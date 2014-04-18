@@ -1,5 +1,0 @@
-backends:
-- name: mappers
-  class: B1
-  instances: 1
-  options: dynamic
