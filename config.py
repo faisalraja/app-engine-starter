@@ -30,3 +30,7 @@ rate_limit = None
 # https://code.google.com/apis/console
 # make sure to add http://localhost:8080 if thats what you will test it on
 endpoints_client_id = 'YOUR_CLIENT_ID'
+
+
+# Project name for namespacing
+project_name = 'App Engine Starter'

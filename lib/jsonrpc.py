@@ -137,8 +137,7 @@ class Server(object):
         except ServerException as e:
             return self.error(id, e.code, e.message, e.data)
         except:
-            logging.error(sys.exc_info())
-            traceback.print_exc()
+            logging.error(''.join(traceback.format_exception(*sys.exc_info())))
             return self.error(id, -32603)
 
         if id is not None:

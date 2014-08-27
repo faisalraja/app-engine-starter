@@ -11,7 +11,7 @@ class HomeHandler(BaseHandler):
     def post(self):
         message = self.request.get('message')
         if not message:
-            self.add_message('Add a message', 'error')
+            self.add_message('Add a message', 'danger')
         elif not self.user_id:
             self.add_message('Please login')
         else:

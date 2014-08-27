@@ -1,9 +1,10 @@
+import cgi
 from jinja2._markupsafe import Markup
 
 
 def nl2br(value):
     if value:
-        return Markup(value.replace('\n', '<br>\n'))
+        return Markup(cgi.escape(value).replace('\n', '<br>\n'))
     return value
 
 
