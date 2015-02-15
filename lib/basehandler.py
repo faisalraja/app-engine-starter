@@ -2,6 +2,7 @@ import os
 import base64
 import logging
 import hashlib
+from google.appengine.api.modules import modules
 import webapp2
 import config
 from datetime import datetime
@@ -181,12 +182,13 @@ class BaseHandler(webapp2.RequestHandler):
     def static_url(self, num=0):
 
         if not IS_DEV:
-            return 'http://{}'.format('.'.join([
-                str(num),
-                str(APP_VERSION),
-                VERSION,
-                app_identity.get_default_version_hostname()
-            ]))
+            cdn_path = [str(num), str(APP_VERSION), VERSION]
+            module_name = modules.get_current_module_name()
+            if module_name != 'default':
+                cdn_path.append(module_name)
+            cdn_path.append(app_identity.get_default_version_hostname())
+
+            return 'http://{}'.format('.'.join(cdn_path))
 
         return 'http://{}'.format(self.request.host)
 
