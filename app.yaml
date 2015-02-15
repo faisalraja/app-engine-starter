@@ -12,7 +12,7 @@ automatic_scaling:
 # The reason you can keep this is because of the static_url method
 # which uses unique id from the app to refresh cache on each deploy
 # just need to make sure you prefix all your static files with it
-default_expiration: "30d"
+default_expiration: "365d"
 
 skip_files:
 - ^(.*/)?#.*#$
