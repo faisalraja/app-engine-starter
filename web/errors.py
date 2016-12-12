@@ -1,3 +1,4 @@
+import config
 from lib.basehandler import BaseHandler
 
 __author__ = 'faisal'
@@ -30,11 +31,14 @@ class Error503Handler(BaseHandler):
         self.response.set_status(429, 'Too Many Requests')
         self.response.headers.add_header('HTTP/1.1', '429 Too Many Requests')
         self.response.headers.add_header('Status', '429')
-        self.response.headers.add_header('Retry-After', '3600')
+        self.response.headers.add_header('Retry-After', str(config.rate_limit[1]))
 
     def get(self):
-        params = {'code': 429, 'title': 'Too Many Request', 'exception': self.request.route_args['exception']}
+        params = {
+            'code': 429,
+            'title': 'Too Many Request',
+            'exception': self.request.route_args['exception'],
+            'rate_limit': config.rate_limit
+        }
         self.setup_headers()
-        # todo you can implement re-captcha test here
-
         return self.render_template('errors/error.html', **params)

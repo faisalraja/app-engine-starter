@@ -3,4 +3,4 @@
 .svn
 .idea
 *.pyc
-gaenv_lib
+ext_lib

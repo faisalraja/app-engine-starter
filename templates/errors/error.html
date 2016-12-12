@@ -1,7 +1,7 @@
 {% extends base_template %}
 
 {% block content %}
-    <h3>{{ title }}</h3>
+    <h1>{{ title }}</h1>
     {% if code == 404 %}
 
         <h4>
@@ -26,19 +26,16 @@
             Something went wrong with the server.
         </h4>
         <p>
-            Message Here
         </p>
 
     {% elif code == 429 %}
         <h4>
-            Too many request in short amount of time.
+            Too many requests in short amount of time.
         </h4>
-        <p>
-            Message here
-        </p>
+        <p>{{ rate_limit.0 }} requests exceeded in {{ rate_limit.1 }} seconds. Try again soon.</p>
     {% endif %}
 
-    {% if is_dev and exception %}
+    {% if is_local and exception %}
         <pre>
             <h4>Dev Error</h4>
             {{ exception }}

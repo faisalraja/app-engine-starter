@@ -1,10 +1,14 @@
 from webapp2_extras.routes import RedirectRoute, PathPrefixRoute, DomainRoute
-from services import sample_jsonrpc
-from web import admin, handlers
+from services import rpc
+from web import admin, handlers, email
 
 _routes = [
     PathPrefixRoute('/admin',[
         RedirectRoute('/', admin.HomeHandler, name='admin-home', strict_slash=True),
+    ]),
+
+    PathPrefixRoute('/task', [
+        RedirectRoute('/email', email.EmailHandler, name='task-email', strict_slash=True),
     ]),
 
     PathPrefixRoute('/user',[
@@ -14,7 +18,7 @@ _routes = [
 
     # Main Routes
     RedirectRoute('/', handlers.HomeHandler, name='home', strict_slash=True),
-    RedirectRoute('/rpc', sample_jsonrpc.ApiHandler, name='rpc', strict_slash=True)
+    RedirectRoute('/rpc', rpc.ApiHandler, name='rpc', strict_slash=True)
 ]
 
 

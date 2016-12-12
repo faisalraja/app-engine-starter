@@ -20,4 +20,11 @@ Summary of things::
 
 Note that this is just a guideline, following it will just make life things easier when your app grows to hundreds of files
 
+# Install Requirements
+
+    # If you are using Homebrew in OSX
+    rm -rf ext_lib/* && echo -e "[install]\nprefix=" > ~/.pydistutils.cfg && pip install -t ext_lib -r requirements.txt && echo "" > ~/.pydistutils.cfg
+    # Regular python command
+    pip install -t ext_lib -r requirements.txt
+
 Demo: http://starter.altlimit-test.appspot.com/

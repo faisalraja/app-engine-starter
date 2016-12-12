@@ -17,7 +17,6 @@ from lib import jsonrpc
 VERSION_ID = os.environ.get('CURRENT_VERSION_ID', '1.1').split('.')
 VERSION = VERSION_ID[0]
 APP_VERSION = int(VERSION_ID[1])
-APP_ID = app_identity.get_application_id()
 
 IS_DEV = os.environ.get('SERVER_SOFTWARE', 'Development/%s' % VERSION_ID).startswith('Dev')
 
@@ -106,7 +105,7 @@ class BaseHandler(webapp2.RequestHandler):
         """
         restrict appspot domains or staging and duplicate contents
         """
-        if self.request.path in ('/sample-allowed-path/here',) or self.request.path.startswith('/_ah/'):
+        if filter(lambda p: p in self.request.path, ('/callback/', '/_ah/', '/task/')):
             # Useful for testing thirdparty callbacks
             pass
         elif self.request.host.endswith('.appspot.com') and \
@@ -181,14 +180,14 @@ class BaseHandler(webapp2.RequestHandler):
 
     def static_url(self, num=0):
 
-        if not IS_DEV:
+        if not config.is_local:
             cdn_path = [str(num), str(APP_VERSION), VERSION]
             module_name = modules.get_current_module_name()
             if module_name != 'default':
                 cdn_path.append(module_name)
             cdn_path.append(app_identity.get_default_version_hostname())
 
-            return 'http://{}'.format('.'.join(cdn_path))
+            return 'https://{}'.format('-dot-'.join(cdn_path))
 
         return 'http://{}'.format(self.request.host)
 
@@ -201,9 +200,9 @@ class BaseHandler(webapp2.RequestHandler):
             # Set global variables.
             'uri_for': self.uri_for,
             'static_url': self.static_url,
-            'is_dev': IS_DEV,
+            'production': config.is_production,
             'project_name': config.project_name,
-            'endpoints_client_id': config.endpoints_client_id
+            'year': datetime.now().year
         })
         j.environment.tests.update({
             # Set tests.
@@ -236,3 +235,15 @@ class RpcHandler(BaseHandler):
     def post(self):
         server = jsonrpc.Server(self)
         server.handle(self.request, self.response)
+
+
+class Webapp2HandlerAdapter(webapp2.BaseHandlerAdapter):
+
+    def __call__(self, request, response, exception):
+        request.route_args = {
+            'exception': exception
+        }
+        logging.exception(exception)
+        handler = self.handler(request, response)
+
+        return handler.get()

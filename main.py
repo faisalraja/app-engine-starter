@@ -13,24 +13,10 @@ from lib import basehandler
 
 app = webapp2.WSGIApplication(debug=basehandler.IS_DEV, config=config.webapp2_config, routes=routes.get_routes())
 
-
-# If you want dynamic custom error handlers use below
-# or just comment it out. This is useful for gracefully showing errors to users
-class Webapp2HandlerAdapter(webapp2.BaseHandlerAdapter):
-
-    def __call__(self, request, response, exception):
-        request.route_args = {
-            'exception': exception
-        }
-        logging.exception(exception)
-        handler = self.handler(request, response)
-
-        return handler.get()
-
-app.error_handlers[403] = Webapp2HandlerAdapter(errors.Error403Handler)
-app.error_handlers[404] = Webapp2HandlerAdapter(errors.Error404Handler)
-app.error_handlers[503] = Webapp2HandlerAdapter(errors.Error503Handler)
-app.error_handlers[500] = Webapp2HandlerAdapter(errors.Error500Handler)
+app.error_handlers[403] = basehandler.Webapp2HandlerAdapter(errors.Error403Handler)
+app.error_handlers[404] = basehandler.Webapp2HandlerAdapter(errors.Error404Handler)
+app.error_handlers[503] = basehandler.Webapp2HandlerAdapter(errors.Error503Handler)
+app.error_handlers[500] = basehandler.Webapp2HandlerAdapter(errors.Error500Handler)
 
 # Make sure all ndb async futures finish
 app = ndb.toplevel(app)

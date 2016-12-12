@@ -7,12 +7,16 @@
     <link rel="apple-touch-icon" href="{{ static_url(1) }}/img/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
+    <!-- Material Design fonts -->
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/icon?family=Material+Icons">
 
     <!-- Le styles -->
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     {# static_url method helps you with automatic cookieless domain using the version of your app #}
     {# parameter 1 helps you divide the loading into different subdomain #}
     <link href="{{ static_url(1) }}/css/style.css" rel="stylesheet">
+    {% block head %}{% endblock %}
 </head>
 
 <body>
@@ -97,20 +101,15 @@
 
     <div id="footer">
       <div class="container">
-        <p class="text-muted">&copy; 2014 altlimit.com</p>
+        <p class="text-muted">&copy; {{ year }} altlimit.com</p>
       </div>
     </div>
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-
-{# todo remove this part since it's just a demo #}
-    <script type="text/javascript">
-        var rpcEndpoint = '{{ uri_for('rpc') }}',
-            client_id = '{{ endpoints_client_id }}';
-    </script>
-    <script src="{{ static_url(2) }}/js/demo.js"></script>
-    <script src="https://apis.google.com/js/client.js?onload=init"></script>
-{# todo end remove demo part#}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+    var rpcEndpoint = '{{ uri_for('rpc') }}';
+</script>
+<script src="{{ static_url(2) }}/js/app.js"></script>
 </body>
 </html>

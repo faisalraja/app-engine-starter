@@ -7,7 +7,8 @@ threadsafe: yes
 
 automatic_scaling:
   max_idle_instances: 1
-  min_pending_latency: 15.0s
+  min_pending_latency: 1s
+  max_pending_latency: 1s
 
 # The reason you can keep this is because of the static_url method
 # which uses unique id from the app to refresh cache on each deploy
@@ -36,9 +37,9 @@ handlers:
   static_files: static/\1/\2
   upload: static/(js|css|img)/.*
 
-# Endpoints handler (in services/__init__.py)
-- url: /_ah/spi/.*
-  script: services.application
+- url: /(admin|task)/.*
+  script: main.app
+  login: admin
 
 - url: .*
   script: main.app
@@ -50,5 +51,7 @@ libraries:
   version: "2.5.2"
 - name: pycrypto
   version: "2.6"
-- name: endpoints
+- name: ssl
   version: "latest"
+- name: PIL
+  version: "1.1.7"

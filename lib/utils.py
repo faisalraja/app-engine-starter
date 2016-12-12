@@ -1,5 +1,14 @@
+import base64
 import cgi
+import hashlib
+import json
+import re
+import requests
+from Crypto import Random
+from Crypto.Cipher import AES
 from jinja2._markupsafe import Markup
+from google.appengine.api import taskqueue
+import config
 
 
 def nl2br(value):
@@ -27,3 +36,63 @@ def pluralize(word, **kwargs):
     if count is not None:
         return word.pop()
     return ' '.join(word)
+
+
+class AESCipher(object):
+
+    def __init__(self, key):
+        self.bs = 32
+        self.key = hashlib.sha256(key.encode()).digest()
+
+    def encrypt(self, raw):
+        raw = self._pad(raw)
+        iv = Random.new().read(AES.block_size)
+        cipher = AES.new(self.key, AES.MODE_CBC, iv)
+        return base64.b64encode(iv + cipher.encrypt(raw))
+
+    def decrypt(self, enc):
+        enc = base64.b64decode(enc)
+        iv = enc[:AES.block_size]
+        cipher = AES.new(self.key, AES.MODE_CBC, iv)
+        return self._unpad(cipher.decrypt(enc[AES.block_size:])).decode('utf-8')
+
+    def _pad(self, s):
+        return s + (self.bs - len(s) % self.bs) * chr(self.bs - len(s) % self.bs)
+
+    @staticmethod
+    def _unpad(s):
+        return s[:-ord(s[len(s)-1:])]
+
+
+def aes_encrypt(data):
+
+    aes = AESCipher(config.encryption_key)
+    return aes.encrypt(data)
+
+
+def aes_decrypt(enc):
+
+    aes = AESCipher(config.encryption_key)
+    return aes.decrypt(enc)
+
+
+def send_email(template, callback='default', **kwargs):
+    taskqueue.add(url='/task/email', params={
+        'template': template,
+        'callback': callback,
+        'params': json.dumps(kwargs)
+    }, queue_name='slow')
+
+
+def is_valid_email(email):
+    if email:
+        return re.match(r'[^@]+@[^@]+\.[^@]+', email)
+
+
+def recaptcha_valid(request):
+
+    return 'g-recaptcha-response' in request.POST and requests.post('https://www.google.com/recaptcha/api/siteverify', {
+        'secret': config.re_captcha['secret'],
+        'response': request.POST['g-recaptcha-response'],
+        'remoteip': request.remote_addr
+    }).json().get('success')
