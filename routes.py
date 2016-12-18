@@ -13,6 +13,8 @@ _routes = [
 
     PathPrefixRoute('/user',[
         RedirectRoute('/login', handlers.LoginHandler, name='user-login', strict_slash=True),
+        RedirectRoute('/login/<provider>', handlers.LoginProviderHandler, name='login-provider',
+                      strict_slash=True, handler_method='any'),
         RedirectRoute('/logout', handlers.LogoutHandler, name='user-logout', strict_slash=True)
     ]),
 

@@ -21,92 +21,61 @@
 
 <body>
 
-    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-        <div class="container">
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
 
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
-              </button>
-              <a class="navbar-brand" href="{{ uri_for('home') }}">{{ project_name|safe }}</a>
-            </div>
+            </button>
+            <a class="navbar-brand" href="{{ uri_for('home') }}">{{ project_name|safe }}</a>
+        </div>
 
-            <div class="collapse navbar-collapse">
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="/">Home</a></li>
-                    <li><a href="{{ uri_for('admin-home') }}">Admin</a></li>
-                    <!-- Api & Web Services Demo -->
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            JSONRPC Demo
-                            <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#" class="rpc-btn" data-method="login">Login with OAuth</a></li>
-                            <li><a href="#" class="rpc-btn" data-method="is_logged_in">Check if logged in</a></li>
-                            <li><a href="#" class="rpc-btn" data-method="logout">Logout</a></li>
-                            <li><a href="#" class="rpc-btn" data-method="hello" data-params='{"world": "Test", "limit": 20}'>Named Params</a></li>
-                            <li><a href="#" class="rpc-btn" data-method="hello" data-params='["Test", 2]'>Positional Params</a></li>
-                            <li><a href="#" class="batch-btn">Batch Requests</a></li>
-                            <li><a href="#" class="rpc-btn" data-method="delete_shouts">Delete Shouts Mapper</a></li>
-                            <li><a href="#" class="rpc-btn" data-method="sample_error">Raise a Server Error</a></li>
-                        </ul>
-                    </li>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="/">Home</a></li>
+                <li><a href="{{ uri_for('admin-home') }}">Admin</a></li>
+            </ul>
 
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            Cloud Endpoints Demo
-                            <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#" class="endpoints-btn" data-method="login">Login with OAuth</a></li>
-                            <li><a href="#" class="endpoints-btn" data-method="get_email">Get email</a></li>
-                            <li><a href="#" class="endpoints-btn" data-method="hello" data-params='{world:"Test", limit: 20}'>Hello List</a></li>
-                            <li><a href="#" class="endpoints-btn" data-method="delete_shouts">Delete Shouts Mapper</a></li>
-                        </ul>
-                    </li>
-
-                    <!-- End Services Demo -->
+            <div class="nav-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    {% if user_id %}
+                        <li><a href="{{ uri_for('user-logout') }}">Logout</a></li>
+                    {% else %}
+                        <li><a href="{{ uri_for('user-login') }}">Login</a></li>
+                    {% endif %}
                 </ul>
-
-                <div class="nav-collapse">
-                    <ul class="nav navbar-nav navbar-right">
-                        {% if user_id %}
-                            <li><a href="{{ uri_for('user-logout') }}">Logout</a></li>
-                        {% else %}
-                            <li><a href="{{ uri_for('user-login') }}">Login</a></li>
-                        {% endif %}
-                    </ul>
-                </div>
-
             </div>
+
         </div>
     </div>
+</div>
 
-    <div id="main-container" class="container">
-        {% if messages %}
-            {% for message in messages %}
+<div id="main-container" class="container">
+    {% if messages %}
+        {% for message in messages %}
             <div class="alert alert-{{ message[1] if message[1] else 'info' }}">
-              <button type="button" class="close" data-dismiss="alert">&times;</button>
-              {{ message[0]|safe }}
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                {{ message[0]|safe }}
             </div>
-            {% endfor %}
-        {% endif %}
+        {% endfor %}
+    {% endif %}
 
-        {% block content %}{% endblock %}
-    </div> <!-- /container -->
+    {% block content %}{% endblock %}
+</div> <!-- /container -->
 
-    <div id="footer">
-      <div class="container">
+<div id="footer">
+    <div class="container">
         <p class="text-muted">&copy; {{ year }} altlimit.com</p>
-      </div>
     </div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/jquery.validate.min.js"></script>
 <script type="text/javascript">
     var rpcEndpoint = '{{ uri_for('rpc') }}';
 </script>

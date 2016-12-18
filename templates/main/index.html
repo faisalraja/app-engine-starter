@@ -2,64 +2,60 @@
 
 {% block content %}
 
-<div class="page-header">
-    <h1>App Engine Starter</h1>
-</div>
-
-    <p class="lead">
-    Create quick prototypes or use for production.
-</p>
-
-<p>
-    To start at baseline, remove the following:
-</p>
-
-<ul>
-    <li>templates/base.html before body, there is comments on which to remove</li>
-    <li>navigation links on base.html</li>
-    <li>app.yaml endpoints handler</li>
-    <li>routes.py rpc handler</li>
-    <li>models/models.py has a Shout model</li>
-    <li>That's it, you should be able to create anything from those demo too.</li>
-</ul>
-
-<div class="row">
-    <div class="col-md-6">
-        <h4>Shouts</h4>
-        {% for shout in shouts %}
-        <blockquote>
-            <p>{{ shout.message }}</p>
-            <p class="pull-right muted">{{ shout.name }}</p>
-        </blockquote>
-        {% endfor %}
-
-        <ul class="pager">
-        {% if prev %}
-              <li><a href="{{ uri_for('home', more=prev, prev=True) }}">Previous</a></li>
-        {% endif %}
-        {% if more %}
-              <li><a href="{{ uri_for('home', more=more) }}">Next</a></li>
-        {% endif %}
-        </ul>
+    <div class="page-header">
+        <h1>App Engine Starter</h1>
     </div>
-    <div class="col-md-6">
-        <form method="post" role="form">
-            <div class="form-group">
-                <label for="message">Shout</label>
-                <textarea rows=3 name="message" id="message" class="form-control"></textarea>
+
+    <div class="row hide" id="alert-box" >
+        <div class="col-md-12">
+            <div class="alert" role="alert">
+
             </div>
-            <div class="form-group">
-                <label for="name">Display Name</label>
-                <input type="text" id="name" name="name" class="form-control" />
-            </div>
-            {% if user_id %}
-                <input type="submit" class="btn btn-primary" value="Shout Out" class="form-control" />
-            {%  else %}
-                <a href="{{ uri_for('user-login') }}" class="btn btn-warning">Sign in to shout</a>
-            {% endif %}
-        </form>
+        </div>
     </div>
-</div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <form method="post" role="form">
+                <h2>Register</h2>
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" />
+                </div>
+                <button type="submit" class="btn btn-primary" class="form-control">
+                    <span class="glyphicon glyphicon-refresh spinning hide"></span> Register
+                </button>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <form method="post" role="form">
+                <h2>Login</h2>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" />
+                </div>
+                <input type="submit" class="btn btn-primary" value="Login" class="form-control" />
+            </form>
+            <p>or Login with</p>
+            <ul>
+                <li><a href="{{ uri_for('login-provider', provider='facebook') }}">Facebook</a></li>
+                <li><a href="{{ uri_for('login-provider', provider='google') }}">Google</a></li>
+                <li><a href="{{ uri_for('login-provider', provider='twitter') }}">Twitter</a></li>
+            </ul>
+        </div>
+    </div>
 
 {% endblock %}
 

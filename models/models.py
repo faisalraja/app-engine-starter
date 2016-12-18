@@ -1,6 +1,7 @@
 import logging
 from google.appengine.ext import ndb
-from passlib.handlers.pbkdf2 import pbkdf2_sha256
+import config
+from passlib.hash import pbkdf2_sha256
 
 from lib import utils
 
@@ -18,7 +19,7 @@ class BaseModel(ndb.Model):
 
         return self.to_client_async().get_result()
 
-    @ndb.tasklet
+    @ndb.tawsklet
     def to_client_async(self):
 
         raise ndb.Return(self.to_dict())
@@ -96,7 +97,7 @@ class User(BaseModel):
     @classmethod
     def get_password(cls, password):
 
-        return pbkdf2_sha256.encrypt(password, rounds=config.password_iterations)
+        return pbkdf2_sha256.using(rounds=config.password_iterations).hash(password)
 
     @ndb.tasklet
     def to_client_async(self):
