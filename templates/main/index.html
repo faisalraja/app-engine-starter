@@ -1,61 +1,31 @@
 {% extends base_template %}
+{% import 'macro/nav.html' as nav with context %}
 
 {% block content %}
 
-    <div class="page-header">
-        <h1>App Engine Starter</h1>
-    </div>
-
-    <div class="row hide" id="alert-box" >
-        <div class="col-md-12">
-            <div class="alert" role="alert">
-
-            </div>
-        </div>
-    </div>
 
     <div class="row">
-        <div class="col-md-6">
-            <form method="post" role="form">
-                <h2>Register</h2>
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" class="form-control" />
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" class="form-control" />
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" class="form-control" />
-                </div>
-                <button type="submit" class="btn btn-primary" class="form-control">
-                    <span class="glyphicon glyphicon-refresh spinning hide"></span> Register
-                </button>
-            </form>
-        </div>
-        <div class="col-md-6">
-            <form method="post" role="form">
-                <h2>Login</h2>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" class="form-control" />
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" class="form-control" />
-                </div>
-                <input type="submit" class="btn btn-primary" value="Login" class="form-control" />
-            </form>
-            <p>or Login with</p>
-            <ul>
-                <li><a href="{{ uri_for('login-provider', provider='facebook') }}">Facebook</a></li>
-                <li><a href="{{ uri_for('login-provider', provider='google') }}">Google</a></li>
-                <li><a href="{{ uri_for('login-provider', provider='twitter') }}">Twitter</a></li>
-            </ul>
-        </div>
-    </div>
 
+        <div class="col-sm-8 blog-main">
+
+            {% for post in posts -%}
+                <div class="blog-post">
+                    <h2 class="blog-post-title">{{ post.title }}</h2>
+                    <p class="blog-post-meta">{{ post.created | js_time_format }} by {{ post.author.name }}</p>
+                    {{ post.desc }}
+                </div><!-- /.blog-post -->
+            {%- endfor %}
+
+            {% if cursor %}
+                <nav class="blog-pagination">
+                    <a class="btn btn-outline-primary" href="{{ uri_for('home', more=cursor) }}">Older</a>
+                </nav>
+            {% endif %}
+
+        </div><!-- /.blog-main -->
+
+        {{ nav.sidebar() }}
+
+    </div><!-- /.row -->
 {% endblock %}
 

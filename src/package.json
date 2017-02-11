@@ -1,0 +1,38 @@
+{
+  "name": "app",
+  "version": "0.0.1",
+  "dependencies": {
+    "bower": "^1.7.9",
+    "gulp": "^3.9.1",
+    "gulp-concat-css": "^2.3.0",
+    "gulp-clean-css": "latest",
+    "gulp-rollup": "latest",
+    "gulp-sass": "^2.3.2",
+    "gulp-watch": "^4.3.9",
+    "configs": "latest",
+    "jquery": "latest",
+    "jquery-ui": "latest",
+    "vue": "latest",
+    "moment": "latest",
+    "blueimp-file-upload": "latest",
+    "bootstrap": "4.0.0-alpha.6",
+    "tether": "1.4.0",
+    "font-awesome": "4.7.0"
+  },
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "scripts": {},
+  "devDependencies": {
+    "filehandler": "*",
+    "finalhandler": "*",
+    "serve-static": "*",
+    "gulp-babel": "^6.1.2",
+    "babel-preset-es2015": "^6.13.2",
+    "babel-plugin-syntax-async-functions": "*",
+    "babel-plugin-transform-async-to-module-method": "*",
+    "gulp-js-minify": "0.0.3",
+    "gulp-rename": "1.2.2",
+    "run-sequence": "1.2.2"
+  }
+}

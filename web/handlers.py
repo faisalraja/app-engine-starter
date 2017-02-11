@@ -15,8 +15,23 @@ authomatic = Authomatic(config=config.auth, secret=str(uuid.uuid4()))
 class HomeHandler(BaseHandler):
 
     def get(self):
-        params = {}
+        posts, cursor = self.query_result(models.Post.get_recent(self.request.get('more')))
+
+        params = {
+            'active': 'home',
+            'posts': posts,
+            'cursor': cursor
+        }
         return self.render_template('main/index.html', **params)
+
+
+class PostHandler(BaseHandler):
+
+    def get(self):
+        params = {
+            'active': 'post'
+        }
+        return self.render_template('main/post.html', **params)
 
 
 class LoginProviderHandler(BaseHandler):
@@ -32,33 +47,10 @@ class LoginProviderHandler(BaseHandler):
                     result.user.update()
 
                 self.session['user_id'] = models.User.get_user_by_oauth(result)
-                logging.debug('UserId: {} Login Data: {}'.format(self.session['user_id'], result.user.data))
-                return self.redirect_to('app')
+                return self.redirect_to('home')
 
     def any(self, provider):
         authomatic.login(Webapp2Adapter(self), provider, self.on_login)
-
-
-class LoginHandler(BaseHandler):
-
-    def get(self):
-        # hold referer to redirect back
-        referer = self.request.referer or '/'
-        if self.request.path not in referer:
-            self.session['referer'] = referer
-
-        referer = self.session.get('referer', '/')
-
-        if self.user_id:
-            self.redirect(referer)
-        else:
-            user = users.get_current_user()
-            if user:
-                self.session['user_id'] = user.user_id()
-                self.redirect(str(referer))
-            else:
-                self.redirect(users.create_login_url(self.request.path_url))
-        return
 
 
 class LogoutHandler(BaseHandler):
@@ -68,5 +60,4 @@ class LogoutHandler(BaseHandler):
         if 'user_id' in self.session:
             del self.session['user_id']
 
-        self.redirect(users.create_logout_url(self.request.referer or '/'))
-        return
+        return self.redirect(self.request.referer or '/')

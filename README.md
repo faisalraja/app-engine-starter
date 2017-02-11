@@ -12,6 +12,7 @@ Summary of things::
     services/ - web services like cloud endpoints or your custom jsonrpc services
     mappers/ - model long tasks goes here for scripting or any task like actions
     static/ - js/css/images and all other static files (templates for js html)
+    src/ - frontend code goes here including js and css
     templates/ - jinja2 templates goes here
     web/ - webpage handlers
     tests/ - unit testing tests goes here
@@ -26,5 +27,11 @@ Note that this is just a guideline, following it will just make life things easi
     rm -rf ext_lib/* && echo -e "[install]\nprefix=" > ~/.pydistutils.cfg && pip install -t ext_lib -r requirements.txt && echo "" > ~/.pydistutils.cfg
     # Regular python command
     pip install -t ext_lib -r requirements.txt
+    
+    # Frontend Dependencies and Watcher command
+    cd src
+    npm install
+    gulp watch
+
 
 Demo: http://starter.altlimit-test.appspot.com/

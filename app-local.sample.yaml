@@ -1,0 +1,19 @@
+# Token/Secrets should be stored here
+env_variables:
+  SESSION_KEY: ''
+  AES_KEY: ''
+  JWT_KEY: ''
+
+  RE_CAPTCHA_KEY: ''
+  RE_CAPTCHA_SECRET: ''
+
+  SENDGRID_KEY: ''
+
+  TWITTER_KEY: ''
+  TWITTER_SECRET: ''
+
+  FB_KEY: ''
+  FB_SECRET: ''
+
+  GOOGLE_KEY: ''
+  GOOGLE_SECRET: ''

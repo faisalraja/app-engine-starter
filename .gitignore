@@ -4,3 +4,7 @@
 .idea
 *.pyc
 ext_lib
+src/node_modules
+static/css/dist
+static/js/dist
+*-local.yaml

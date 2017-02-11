@@ -95,11 +95,9 @@ class Server(object):
         else:
             params = {}
 
-        if method.startswith('_'):
-            return self.error(id, -32601)
-        try:
+        if method in vars(self.obj.__class__) and not method.startswith('_'):
             method = getattr(self.obj, method)
-        except AttributeError:
+        else:
             return self.error(id, -32601)
 
         method_info = inspect.getargspec(method)

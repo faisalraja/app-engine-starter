@@ -1,3 +1,4 @@
+import json
 import os
 import base64
 import logging
@@ -10,7 +11,7 @@ from google.appengine.api import users, app_identity, memcache
 from google.appengine.ext import ndb
 from webapp2_extras import jinja2
 from webapp2_extras import sessions
-from lib import jsonrpc
+from lib import jsonrpc, utils
 
 # Initialize constants & stuff for static files
 
@@ -195,14 +196,17 @@ class BaseHandler(webapp2.RequestHandler):
         j = jinja2.Jinja2(app)
         j.environment.filters.update({
             # Set filters.
+            'json_dumps': json.dumps,
+            'js_time_format': utils.js_time_format
         })
         j.environment.globals.update({
             # Set global variables.
             'uri_for': self.uri_for,
             'static_url': self.static_url,
-            'production': config.is_production,
+            'is_production': config.is_production,
+            'is_local': config.is_local,
             'project_name': config.project_name,
-            'year': datetime.now().year
+            'now': datetime.now()
         })
         j.environment.tests.update({
             # Set tests.
@@ -228,6 +232,21 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.response.headers.add_header('X-UA-Compatible', 'IE=Edge,chrome=1')
         self.response.write(self.jinja2.render_template(filename, **kwargs))
+
+    def query_result(self, data, **kwargs):
+        my_list, cursor, more = data
+
+        futures = [d.to_client_async(**kwargs) for d in my_list]
+        ndb.Future.wait_all(futures)
+
+        web_cursor = None
+        if more:
+            if hasattr(cursor, 'urlsafe'):
+                web_cursor = cursor.urlsafe()
+            elif hasattr(cursor, 'web_safe_string'):
+                web_cursor = cursor.web_safe_string
+
+        return [future.get_result() for future in futures], web_cursor
 
 
 class RpcHandler(BaseHandler):

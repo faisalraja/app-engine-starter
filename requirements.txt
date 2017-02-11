@@ -3,3 +3,5 @@ sendgrid
 pyjwt
 authomatic
 requests
+requests-toolbelt
+cerberus

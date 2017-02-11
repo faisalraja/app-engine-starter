@@ -1,84 +1,74 @@
+{%- import 'macro/nav.html' as nav with context -%}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>{% block title %}Home{% endblock %} - {{ project_name|safe }}</title>
-    {# Replace your logos, this is so no 404's are generated #}
-    <link rel="apple-touch-icon" href="{{ static_url(1) }}/img/logo.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
-    <!-- Material Design fonts -->
-    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700">
-    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <meta name="author" content="">
 
-    <!-- Le styles -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    {# static_url method helps you with automatic cookieless domain using the version of your app #}
-    {# parameter 1 helps you divide the loading into different subdomain #}
-    <link href="{{ static_url(1) }}/css/style.css" rel="stylesheet">
+    <link rel="icon" href="{{ static_url(1) }}/img/logo.png">
+
+    <title>{% block title %}Home{% endblock %} - {{ project_name|safe }}</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Nunito+Sans|Open+Sans|Roboto" rel="stylesheet">
+
+    <link href="{{ static_url(1) }}/css/dist/main.css" rel="stylesheet">
+    <script>
+        window.appData = {};
+        {% if messages %}
+            window.appData.globalMessages = {{ messages |safe }};
+        {% endif %}
+    </script>
     {% block head %}{% endblock %}
 </head>
 
 <body>
-
-<div class="navbar navbar-default navbar-fixed-top" role="navigation">
-    <div class="container">
-
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="{{ uri_for('home') }}">{{ project_name|safe }}</a>
-        </div>
-
-        <div class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="/">Home</a></li>
-                <li><a href="{{ uri_for('admin-home') }}">Admin</a></li>
-            </ul>
-
-            <div class="nav-collapse">
-                <ul class="nav navbar-nav navbar-right">
-                    {% if user_id %}
-                        <li><a href="{{ uri_for('user-logout') }}">Logout</a></li>
-                    {% else %}
-                        <li><a href="{{ uri_for('user-login') }}">Login</a></li>
-                    {% endif %}
-                </ul>
-            </div>
-
+<div id="app">
+    <div class="blog-masthead">
+        <div class="container">
+            {{ nav.top_nav() }}
         </div>
     </div>
-</div>
 
-<div id="main-container" class="container">
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message[1] if message[1] else 'info' }}">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
-                {{ message[0]|safe }}
-            </div>
-        {% endfor %}
-    {% endif %}
+    {% block header %}
+        {{ nav.header(project_name, 'Project for quick prototyping') }}
+    {% endblock %}
 
-    {% block content %}{% endblock %}
-</div> <!-- /container -->
+    <loader></loader>
+    <messages></messages>
 
-<div id="footer">
     <div class="container">
-        <p class="text-muted">&copy; {{ year }} altlimit.com</p>
-    </div>
+        {% if page_component %}
+            {{ ('<' + page_component + ' inline-template><div class="init-hide">') | safe }}
+        {% endif %}
+        {% block content %}{% endblock %}
+        {% if page_component %}
+            {{ ('</div></' + page_component + '>') | safe }}
+        {% endif %}
+    </div><!-- /.container -->
+
+    <footer class="blog-footer">
+        <p>&copy; {{ now.year }} <a href="http://www.altlimit.com">altlimit.com</a></p>
+        <p>
+            <a href="#">Back to top</a>
+        </p>
+    </footer>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/jquery.validate.min.js"></script>
-<script type="text/javascript">
-    var rpcEndpoint = '{{ uri_for('rpc') }}';
-</script>
-<script src="{{ static_url(2) }}/js/app.js"></script>
+{% if is_local %}
+    <script src="/js/dist/jquery.min.js"></script>
+    <script src="/js/dist/tether.min.js"></script>
+    <script src="/js/dist/bootstrap.min.js"></script>
+    <script src="/js/dist/vue.min.js"></script>
+    <script src="/js/dist/main.js"></script>
+{% else %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.10/vue.min.js"></script>
+    <script src="{{ static_url(2) }}/js/dist/main.min.js"></script>
+{% endif %}
 </body>
 </html>

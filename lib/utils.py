@@ -3,6 +3,8 @@ import cgi
 import hashlib
 import json
 import re
+import time
+import datetime
 import requests
 from Crypto import Random
 from Crypto.Cipher import AES
@@ -89,10 +91,19 @@ def is_valid_email(email):
         return re.match(r'[^@]+@[^@]+\.[^@]+', email)
 
 
-def recaptcha_valid(request):
-
-    return 'g-recaptcha-response' in request.POST and requests.post('https://www.google.com/recaptcha/api/siteverify', {
+def recaptcha_valid(response, remote_addr):
+    return requests.post('https://www.google.com/recaptcha/api/siteverify', {
         'secret': config.re_captcha['secret'],
-        'response': request.POST['g-recaptcha-response'],
-        'remoteip': request.remote_addr
+        'response': response,
+        'remoteip': remote_addr
     }).json().get('success')
+
+
+def to_js_time(d):
+
+    return int(time.mktime(d.timetuple())) * 1000 if d is not None else None
+
+
+def js_time_format(ts, fmt='%Y-%m-%d %H:%M:%S'):
+
+    return datetime.datetime.fromtimestamp(int(ts / 1000)).strftime(fmt)

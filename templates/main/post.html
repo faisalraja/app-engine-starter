@@ -1,0 +1,42 @@
+{% extends base_template %}
+{% import 'macro/nav.html' as nav with context %}
+
+{% set page_component = 'page-post' %}
+
+{% block content %}
+
+    <div class="row">
+
+        <div class="col-sm-8 blog-main">
+            {% if user_id %}
+                <rpc-form method="save_post" :on-success="onPost" inline-template>
+                    <form v-on:submit.prevent="submit">
+
+                        <div class="form-group" :class="{ 'has-danger': error.title }">
+                            <label for="title">Title</label>
+                            <input type="text" class="form-control" id="title" v-model="data.title" placeholder="Title">
+                            <div class="form-control-feedback" v-text="error.title"></div>
+                        </div>
+                        <div class="form-group" :class="{ 'has-danger': error.desc }">
+                            <label for="desc">Description</label>
+                            <textarea class="form-control" id="desc" v-model="data.desc" rows="3"></textarea>
+                            <div class="form-control-feedback" v-text="error.desc"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </rpc-form>
+            {% else %}
+                Sign In To Post
+                <ul>
+                    <li><a href="{{ uri_for('account-login-provider', provider='google') }}">Sign in with Google</a></li>
+                    <li><a href="{{ uri_for('account-login-provider', provider='facebook') }}">Sign in with Facebook</a></li>
+                    <li><a href="{{ uri_for('account-login-provider', provider='twitter') }}">Sign in with Twitter</a></li>
+                </ul>
+            {% endif %}
+        </div>
+
+        {{ nav.sidebar() }}
+
+    </div><!-- /.row -->
+{% endblock %}
+

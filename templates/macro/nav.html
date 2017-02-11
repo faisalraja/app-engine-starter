@@ -1,0 +1,40 @@
+
+{% macro top_nav() -%}
+    <nav class="nav blog-nav">
+        {% for link in (('home', 'Home'), ('post', 'Post')) %}
+            <a class="nav-link {{ 'active' if link[0] == active }}" href="{{ uri_for(link[0]) }}">{{ link[1] }}</a>
+        {% endfor %}
+        {% if user_id %}
+            <a class="nav-link" href="{{ uri_for('account-logout') }}">Logout</a>
+        {% endif %}
+    </nav>
+{%- endmacro %}
+
+{% macro header(title, desc) -%}
+    <div class="blog-header">
+        <div class="container">
+            <h1 class="blog-title">{{ title }}</h1>
+            <p class="lead blog-description">{{ desc }}</p>
+        </div>
+    </div>
+{%- endmacro  %}
+
+{% macro sidebar() -%}
+    <div class="col-sm-3 offset-sm-1 blog-sidebar">
+        <div class="sidebar-module sidebar-module-inset">
+            <h4>About</h4>
+            <p>
+                I use this to create the basic app engine skeleton project for quick prototyping.
+                Most of the setup can also be used for final production app, your files should be organized
+                if you follow it's core setup.
+            </p>
+        </div>
+        <div class="sidebar-module">
+            <h4>Links</h4>
+            <ol class="list-unstyled">
+                <li><a href="https://github.com/faisalraja">GitHub</a></li>
+                <li><a href="http://www.altlimit.com">Altlimit</a></li>
+            </ol>
+        </div>
+    </div><!-- /.blog-sidebar -->
+{%- endmacro %}

@@ -1,8 +1,10 @@
 import logging
 from google.appengine.ext import ndb
 import config
+from lib import validators
+from lib.jsonrpc import ServerException
+from lib.validators import ValidationError
 from passlib.hash import pbkdf2_sha256
-
 from lib import utils
 
 __author__ = 'faisal'
@@ -15,13 +17,13 @@ class BaseModel(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
     modified = ndb.DateTimeProperty(auto_now=True)
 
-    def to_client(self):
+    def to_client(self, **kwargs):
 
-        return self.to_client_async().get_result()
+        return self.to_client_async(**kwargs).get_result()
 
-    @ndb.tawsklet
-    def to_client_async(self):
-
+    @ndb.tasklet
+    def to_client_async(self, **kwargs):
+        """Standardize your client data and use keyword args for adding sensitive data on logged in users"""
         raise ndb.Return(self.to_dict())
 
     @classmethod
@@ -100,7 +102,7 @@ class User(BaseModel):
         return pbkdf2_sha256.using(rounds=config.password_iterations).hash(password)
 
     @ndb.tasklet
-    def to_client_async(self):
+    def to_client_async(self, **kwargs):
 
         return {
             'id': self.key.id() if self.key else None,
@@ -109,3 +111,53 @@ class User(BaseModel):
             'name': self.name,
             'email': self.email
         }
+
+
+class Post(BaseModel):
+    title = ndb.StringProperty(indexed=False)
+    desc = ndb.TextProperty()
+    author = ndb.IntegerProperty()
+
+    @classmethod
+    def save_post(cls, user, data):
+
+        v = validators.build({
+            'title': {'required': True, 'empty': False},
+            'desc': {'required': True, 'empty': False}
+        })
+
+        if not v.validate(data):
+            raise ValidationError(v.errors)
+
+        # todo demo purposes
+        if not config.is_local:
+            raise ServerException('Disabled on demo page')
+
+        post = cls(author=user,
+                   title=data['title'],
+                   desc=data['desc'])
+        post.put()
+
+        return post
+
+    @classmethod
+    def get_recent(cls, cursor=None):
+        qry = cls.query().order(-cls.created)
+
+        return cls.cached_query_async(qry, cursor).get_result()
+
+    @ndb.tasklet
+    def to_client_async(self, **kwargs):
+        # if there are multiple make sure to yield it in groups if possible
+        # author, other = yield User.get_by_id_async(self.author), other_async()
+        author = yield User.get_by_id_async(self.author)
+        author_client = yield author.to_client_async(**kwargs)
+
+        raise ndb.Return({
+            'id': self.key.id() if self.key else None,
+            'created': utils.to_js_time(self.created),
+            'modified': utils.to_js_time(self.modified),
+            'title': self.title,
+            'desc': self.desc,
+            'author': author_client
+        })

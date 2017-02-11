@@ -18,7 +18,7 @@ restricted_auth = None  # 'admin:admin'
 # >>> binascii.b2a_hex(os.urandom(32)).upper()
 webapp2_config = {
     'webapp2_extras.sessions': {
-        'secret_key': '-- generate a random 64 hexa decimal here per project --'
+        'secret_key': os.environ['SESSION_KEY']
     },
 }
 
@@ -40,14 +40,14 @@ project_name = 'App Engine Starter'
 password_iterations = 10000
 
 # AES256 Encryption Key
-encryption_key = '-- generate a random 64 characters encryption key --'
+encryption_key = os.environ['AES_KEY']
 
 sendgrid = {
-    'api_key': '-- key --',
+    'api_key': os.environ['SENDGRID_KEY'],
     'from_email': 'support@your-domain-here'
 }
 
-jwt_secret = '-- generate your jwt secret --'
+jwt_secret = os.environ['JWT_KEY']
 
 # 1 hour email token expiration
 email_token_expire_seconds = 3600
@@ -59,16 +59,16 @@ allowed_dev_email_recipients = [
 
 # google recaptcha keys
 re_captcha = {
-    'key': '-- key --',
-    'secret': '-- secret --'
+    'key': os.environ['RE_CAPTCHA_KEY'],
+    'secret': os.environ['RE_CAPTCHA_SECRET']
 }
 
 # auth providers settings using authomatic
 auth = {
     'twitter': {
         'class_': oauth1.Twitter,
-        'consumer_key': '-- key --',
-        'consumer_secret': '-- secret --',
+        'consumer_key': os.environ['TWITTER_KEY'],
+        'consumer_secret': os.environ['TWITTER_SECRET'],
     },
 
     'google': {
@@ -76,8 +76,8 @@ auth = {
 
         # Provider type specific keyword arguments:
         'short_name': 2,  # use authomatic.short_name() to generate this automatically
-        'consumer_key': '-- key --',
-        'consumer_secret': '-- secret --',
+        'consumer_key': os.environ['GOOGLE_KEY'],
+        'consumer_secret': os.environ['GOOGLE_SECRET'],
         'scope': ['profile', 'email']
     },
 
@@ -86,10 +86,29 @@ auth = {
         'class_': oauth2.Facebook,
 
         # Facebook is an AuthorizationProvider too.
-        'consumer_key': '-- key --',
-        'consumer_secret': '-- secret --',
+        'consumer_key': os.environ['FB_KEY'],
+        'consumer_secret': os.environ['FB_SECRET'],
 
         # But it is also an OAuth 2.0 provider and it needs scope.
         'scope': ['email'],
     }
 }
+
+# Configuration Based on Environment
+if is_local:
+    uri = {
+        'domain': 'localhost:8080',
+        'protocol': 'http'
+    }
+elif is_production:
+    uri = {
+        'domain': 'production-domain.appspot.com',
+        'protocol': 'https'
+    }
+else:
+    uri = {
+        'domain': 'development-domain.appspot.com',
+        'protocol': 'https'
+    }
+
+url = '{protocol}://{domain}'.format(**uri)
