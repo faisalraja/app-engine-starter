@@ -182,7 +182,7 @@ class BaseHandler(webapp2.RequestHandler):
     def static_url(self, num=0):
 
         if not config.is_local:
-            cdn_path = [str(num), str(APP_VERSION), VERSION]
+            cdn_path = ['-'.join([str(num), str(APP_VERSION), VERSION])]
             module_name = modules.get_current_module_name()
             if module_name != 'default':
                 cdn_path.append(module_name)

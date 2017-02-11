@@ -24,7 +24,6 @@ Vue.mixin({
                 $.post('/rpc', data, 'json')
                     .done(function (resp) {
                         if (resp.error) {
-                            console.log(resp.error);
                             if (resp.error.code == -32000) {
                                 self.alert(resp.error.message, resp.error.data || '', 'danger');
                             }
