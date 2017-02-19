@@ -33,6 +33,7 @@ class ValidationError(ServerException):
 def build(schema, messages=None):
     v = cerberus.Validator(
         schema,
+        allow_unknown=True,
         error_handler=CustomErrorHandler(messages=messages)
     )
     return v

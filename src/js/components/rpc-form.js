@@ -9,11 +9,12 @@ Vue.component('rpc-form', {
             d: {}
         };
     },
-    props: ['method', 'onSuccess', 'onError'],
+    props: ['method', 'onSuccess', 'onError', 'initData'],
     methods: {
         submit() {
             let self = this;
             self.loading = true;
+            self.error = {};
 
             if ($(this.$el).find('.g-recaptcha').length) {
                 self.data.recaptcha = grecaptcha.getResponse();
@@ -34,11 +35,18 @@ Vue.component('rpc-form', {
 
                 if ($.isFunction(self.onError)) {
                     self.onError(error);
+                } else {
+                    console.error(error);
                 }
 
             }).then(function () {
                 self.loading = false;
             });
+        }
+    },
+    created() {
+        if (this.initData) {
+            this.data = this.initData;
         }
     }
 });
