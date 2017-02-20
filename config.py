@@ -16,9 +16,10 @@ restricted_auth = None  # 'admin:admin'
 # Generating random hex
 # >>> import os,binascii
 # >>> binascii.b2a_hex(os.urandom(32)).upper()
+session_key = os.getenv('SESSION_KEY')
 webapp2_config = {
     'webapp2_extras.sessions': {
-        'secret_key': os.environ['SESSION_KEY']
+        'secret_key': session_key
     },
 }
 

@@ -1,15 +1,12 @@
 import logging
-import uuid
-
 import config
 from authomatic import Authomatic
 from authomatic.adapters import Webapp2Adapter
-from google.appengine.api import users
 from lib.basehandler import BaseHandler
 from models import models
 
 
-authomatic = Authomatic(config=config.auth, secret=str(uuid.uuid4()))
+authomatic = Authomatic(config=config.auth, secret=config.session_key)
 
 
 class HomeHandler(BaseHandler):
