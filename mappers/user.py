@@ -1,7 +1,7 @@
 import datetime
 import logging
 from lib.mapper import Mapper
-from models import models
+import models
 
 __author__ = 'faisal'
 

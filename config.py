@@ -1,4 +1,6 @@
 import os
+
+from authomatic import Authomatic
 from google.appengine.api import app_identity
 from lib import auth_provider
 from authomatic.providers import oauth2, oauth1
@@ -94,6 +96,9 @@ auth = {
         'scope': ['email'],
     }
 }
+
+# Authomatic instance
+authomatic = Authomatic(config=auth, secret=session_key)
 
 # Configuration Based on Environment
 if is_local:

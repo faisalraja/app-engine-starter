@@ -2,7 +2,7 @@ import logging
 from lib.basehandler import RpcHandler
 from google.appengine.ext import deferred
 from lib.jsonrpc import ServerException
-from models import models
+import models
 
 
 class ApiHandler(RpcHandler):

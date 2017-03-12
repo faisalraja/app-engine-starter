@@ -3,10 +3,7 @@ import config
 from authomatic import Authomatic
 from authomatic.adapters import Webapp2Adapter
 from lib.basehandler import BaseHandler
-from models import models
-
-
-authomatic = Authomatic(config=config.auth, secret=config.session_key)
+import models
 
 
 class HomeHandler(BaseHandler):
@@ -47,7 +44,7 @@ class LoginProviderHandler(BaseHandler):
                 return self.redirect_to('home')
 
     def any(self, provider):
-        authomatic.login(Webapp2Adapter(self), provider, self.on_login)
+        config.authomatic.login(Webapp2Adapter(self), provider, self.on_login)
 
 
 class LogoutHandler(BaseHandler):
