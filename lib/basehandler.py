@@ -253,7 +253,7 @@ class RpcHandler(BaseHandler):
 
     def post(self):
         server = jsonrpc.Server(self)
-        server.handle(self.request, self.response)
+        server.handle(self.request, self.response).get_result()
 
 
 class Webapp2HandlerAdapter(webapp2.BaseHandlerAdapter):

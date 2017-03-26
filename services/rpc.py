@@ -1,6 +1,6 @@
 import logging
 from lib.basehandler import RpcHandler
-from google.appengine.ext import deferred
+from google.appengine.ext import deferred, ndb
 from lib.jsonrpc import ServerException
 import models
 

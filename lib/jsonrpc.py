@@ -16,9 +16,27 @@ server.handler(webapp2.request, webapp2.response)
 Client Usage: (Passing headers help with authorization cookies)
 client = Client('http://path/to/rpc', webapp2.request.headers)
 client.method_name(args)
+Batch usage:
+with client:
+    m1 = client.method_1(args)
+    m2 = client.method_2(args)
+    
+with client:
+    m3 = client.method_1(diff_args)
+    m4 = client.method_2(diff_args)
+
+Then call to get the result
+print m1() - if this is an async client, it will batch the call on your first result call
+print m2()
+
+If you are doing large number of batches, and you are done with the results call clear_batch_result()
+to free up memory
 
 ClientAsync is same as client except it returns a future so you need to call get_result() for it.
 Also uses ndb context so it will be auto batched with other ndb async calls.
+
+Batch in ClientAsync works the same way, there is no need to call get_result() on anything. It will auto batch
+everything in your first result call.
 """
 
 VERSION = '2.0'
@@ -63,6 +81,7 @@ class Server(object):
             if hasattr(self.response, 'write'):
                 self.response.write(json.dumps(result))
 
+    @ndb.tasklet
     def handle(self, request, response=None, data=None):
         self.response = response
 
@@ -70,16 +89,15 @@ class Server(object):
             try:
                 data = json.loads(request.body)
             except ValueError, e:
-                return self.error(None, -32700)
+                raise ndb.Return(self.error(None, -32700))
         # batch calls
         if isinstance(data, list):
-            # todo implement async batch
-            batch_result = [self.handle(None, None, d) for d in data]
+            batch_result = yield [self.handle(None, None, d) for d in data]
             self.response = response
-            return self.result(batch_result)
+            raise ndb.Return(self.result(batch_result))
 
         if data.get('jsonrpc') != '2.0':
-            return self.error(-32600)
+            raise ndb.Return(self.error(-32600))
 
         if 'id' in data:
             id = data['id']
@@ -89,7 +107,7 @@ class Server(object):
         if 'method' in data:
             method = data['method']
         else:
-            return self.error(id, -32600)
+            raise ndb.Return(self.error(id, -32600))
 
         if 'params' in data:
             params = data['params']
@@ -99,7 +117,7 @@ class Server(object):
         if method in vars(self.obj.__class__) and not method.startswith('_'):
             method = getattr(self.obj, method)
         else:
-            return self.error(id, -32601)
+            raise ndb.Return(self.error(id, -32601))
 
         method_info = inspect.getargspec(method)
         arg_len = len(method_info.args)
@@ -110,10 +128,10 @@ class Server(object):
         # Check if params is valid and remove extra params
         named_params = not isinstance(params, list)
         invalid_params = False
+        clean_params = {}
         if arg_len > 1 and params is None:
             invalid_params = True
         elif named_params:
-            clean_params = {}
             if arg_len > 1:
                 req_len = arg_len - def_len
                 for i in range(1, arg_len):
@@ -127,26 +145,30 @@ class Server(object):
                 invalid_params = True
 
         if invalid_params:
-            return self.error(id, -32602)
+            raise ndb.Return(self.error(id, -32602))
         try:
             if named_params:
                 result = method(**clean_params)
             else:
                 result = method(*params)
+            if isinstance(result, ndb.Future):
+                result = yield result
         except ServerException as e:
-            return self.error(id, e.code, e.message, e.data)
+            raise ndb.Return(self.error(id, e.code, e.message, e.data))
         except:
             logging.error(''.join(traceback.format_exception(*sys.exc_info())))
-            return self.error(id, -32603)
+            raise ndb.Return(self.error(id, -32603))
 
         if id is not None:
-            return self.result({'result': result, 'id': id, 'jsonrpc': VERSION})
+            raise ndb.Return(self.result({'result': result, 'id': id, 'jsonrpc': VERSION}))
 
 
 class Client(object):
     def __init__(self, uri, headers=None):
         self.uri = uri
         self.headers = headers or {}
+        self.batch = None
+        self.batch_results = {}
 
     def __getattr__(self, method):
 
@@ -161,13 +183,41 @@ class Client(object):
 
         return default
 
-    def request(self, method, params):
-        parameters = {
+    def __enter__(self):
+        self.batch = []
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        batch = self.batch
+        self.batch = None
+        self.request(None, None, batch=batch)
+
+    def clear_batch_results(self):
+        self.batch_results = {}
+
+    def set_batch_results(self, result):
+        for r in result:
+            if r.get('id'):
+                self.batch_results[r['id']] = r.get('result')
+
+    def batch_result(self, result_id):
+
+        def result():
+            return self.batch_results.get(result_id)
+
+        return result
+
+    def request(self, method, params, batch=None):
+        parameters = batch or {
             'id': str(uuid.uuid4()),
             'method': method,
             'params': params,
             'jsonrpc': VERSION
         }
+
+        if self.batch is not None and batch is None:
+            self.batch.append(parameters)
+            return self.batch_result(parameters['id'])
+
         data = json.dumps(parameters)
 
         headers = {
@@ -182,7 +232,9 @@ class Client(object):
         except ValueError:
             raise ServerException(ERROR_MESSAGE[-32700], code=-32700)
 
-        if 'error' in result:
+        if batch is not None:
+            self.set_batch_results(result)
+        elif 'error' in result:
             raise ServerException(
                 message='{} Code: {}'.format(result['error']['message'], result['error']['code']),
                 code=result['error']['code']
@@ -195,6 +247,37 @@ class ClientAsync(object):
     def __init__(self, uri, headers=None):
         self.uri = uri
         self.headers = headers or {}
+        self.batch = None
+        self.batch_results = {}
+        self.pending_batch = []
+
+    def __enter__(self):
+        self.batch = []
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        batch = self.batch
+        self.batch = None
+        self.pending_batch.append(self.request_async(None, None, batch=batch))
+
+    def clear_batch_results(self):
+        self.batch_results = {}
+
+    def set_batch_results(self, result):
+        for r in result:
+            if r.get('id'):
+                self.batch_results[r['id']] = r.get('result')
+
+    def batch_result(self, result_id):
+
+        def result():
+            if self.pending_batch:
+                ndb.Future.wait_all(self.pending_batch)
+                [batch.get_result() for batch in self.pending_batch]
+                self.pending_batch = []
+
+            return self.batch_results.get(result_id)
+
+        return result
 
     def __getattr__(self, method):
 
@@ -209,16 +292,30 @@ class ClientAsync(object):
             req = yield self.request_async(method, params)
             raise ndb.Return(req)
 
-        return default_async
+        def default(*args, **kwargs):
+            params = {}
+            if len(kwargs) > 0:
+                params = kwargs
+            elif len(args) > 0:
+                params = args
+
+            return self.request_async(method, params).get_result()
+
+        return default_async if self.batch is None else default
 
     @ndb.tasklet
-    def request_async(self, method, params):
-        parameters = {
+    def request_async(self, method, params, batch=None):
+        parameters = batch or {
             'id': str(uuid.uuid4()),
             'method': method,
             'params': params,
             'jsonrpc': VERSION
         }
+
+        if self.batch is not None and batch is None:
+            self.batch.append(parameters)
+            raise ndb.Return(self.batch_result(parameters['id']))
+
         data = json.dumps(parameters)
 
         headers = {
@@ -234,7 +331,9 @@ class ClientAsync(object):
         except:
             raise ServerException(ERROR_MESSAGE[-32700], code=-32700)
 
-        if 'error' in result:
+        if batch is not None:
+            self.set_batch_results(result)
+        elif 'error' in result:
             raise ServerException(
                 message='{} Code: {}'.format(result['error']['message'], result['error']['code']),
                 code=result['error']['code']
