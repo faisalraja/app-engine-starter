@@ -35,6 +35,7 @@ class ServerException(Exception):
     """
     code -32000 to -32099 for custom server errors
     """
+
     def __init__(self, data=None, message='Server error', code=-32000):
         Exception.__init__(self, message)
         self.data = data
@@ -143,36 +144,28 @@ class Server(object):
 
 
 class Client(object):
-
-    def __init__(self, uri, headers={}):
+    def __init__(self, uri, headers=None):
         self.uri = uri
-        self.headers = headers
+        self.headers = headers or {}
 
-    def __getattr__(self, key):
-        try:
-            return object.__getattr__(self, key)
-        except AttributeError:
-            return self.dispatch(key)
+    def __getattr__(self, method):
 
-    def default(self, *args, **kw):
-        if len(kw) > 0:
-            self.params = kw
-        elif len(args) > 0:
-            self.params = args
-        else:
-            self.params = {}
+        def default(*args, **kwargs):
+            params = {}
+            if len(kwargs) > 0:
+                params = kwargs
+            elif len(args) > 0:
+                params = args
 
-        return self.request()
+            return self.request(method, params)
 
-    def dispatch(self, key):
-        self.method = key
-        return self.default
+        return default
 
-    def request(self):
+    def request(self, method, params):
         parameters = {
             'id': str(uuid.uuid4()),
-            'method': self.method,
-            'params': self.params,
+            'method': method,
+            'params': params,
             'jsonrpc': VERSION
         }
         data = json.dumps(parameters)
@@ -186,51 +179,44 @@ class Client(object):
         response = urllib2.urlopen(req).read()
         try:
             result = json.loads(response)
-        except:
-            return None
+        except ValueError:
+            raise ServerException(ERROR_MESSAGE[-32700], code=-32700)
 
         if 'error' in result:
-            raise Exception('%s Code: %s' % (result['error']['message'], result['error']['code']))
-        if parameters['id'] == result['id'] and 'result' in result:
+            raise ServerException(
+                message='{} Code: {}'.format(result['error']['message'], result['error']['code']),
+                code=result['error']['code']
+            )
+        elif parameters['id'] == result['id'] and 'result' in result:
             return result['result']
-        else:
-            return None
 
 
 class ClientAsync(object):
-
-    def __init__(self, uri, headers={}):
+    def __init__(self, uri, headers=None):
         self.uri = uri
-        self.headers = headers
+        self.headers = headers or {}
 
-    def __getattr__(self, key):
-        try:
-            return object.__getattr__(self, key)
-        except AttributeError:
-            return self.dispatch(key)
+    def __getattr__(self, method):
 
-    @ndb.tasklet
-    def default_async(self, *args, **kw):
-        if len(kw) > 0:
-            self.params = kw
-        elif len(args) > 0:
-            self.params = args
-        else:
-            self.params = {}
+        @ndb.tasklet
+        def default_async(*args, **kwargs):
+            params = {}
+            if len(kwargs) > 0:
+                params = kwargs
+            elif len(args) > 0:
+                params = args
 
-        req = yield self.request_async()
-        raise ndb.Return(req)
+            req = yield self.request_async(method, params)
+            raise ndb.Return(req)
 
-    def dispatch(self, key):
-        self.method = key
-        return self.default_async
+        return default_async
 
     @ndb.tasklet
-    def request_async(self):
+    def request_async(self, method, params):
         parameters = {
             'id': str(uuid.uuid4()),
-            'method': self.method,
-            'params': self.params,
+            'method': method,
+            'params': params,
             'jsonrpc': VERSION
         }
         data = json.dumps(parameters)
@@ -246,11 +232,12 @@ class ClientAsync(object):
         try:
             result = json.loads(response.content)
         except:
-            raise ndb.Return(None)
+            raise ServerException(ERROR_MESSAGE[-32700], code=-32700)
 
         if 'error' in result:
-            raise Exception('%s Code: %s' % (result['error']['message'], result['error']['code']))
-        if parameters['id'] == result['id'] and 'result' in result:
+            raise ServerException(
+                message='{} Code: {}'.format(result['error']['message'], result['error']['code']),
+                code=result['error']['code']
+            )
+        elif parameters['id'] == result['id'] and 'result' in result:
             raise ndb.Return(result['result'])
-        else:
-            raise ndb.Return(None)
