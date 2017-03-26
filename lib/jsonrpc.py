@@ -81,8 +81,11 @@ class Server(object):
             if hasattr(self.response, 'write'):
                 self.response.write(json.dumps(result))
 
+    def handle(self, request, response, data=None):
+        return self.handle_async(request, response, data).get_result()
+
     @ndb.tasklet
-    def handle(self, request, response=None, data=None):
+    def handle_async(self, request, response=None, data=None):
         self.response = response
 
         if not data:
@@ -92,7 +95,7 @@ class Server(object):
                 raise ndb.Return(self.error(None, -32700))
         # batch calls
         if isinstance(data, list):
-            batch_result = yield [self.handle(None, None, d) for d in data]
+            batch_result = yield [self.handle_async(None, None, d) for d in data]
             self.response = response
             raise ndb.Return(self.result(batch_result))
 
