@@ -195,7 +195,7 @@ class Client(object):
         self.request(None, None, batch=batch)
 
     def clear_batch_results(self):
-        self.batch_results = {}
+        self.batch_results.clear()
 
     def set_batch_results(self, result):
         for r in result:
@@ -263,7 +263,7 @@ class ClientAsync(object):
         self.pending_batch.append(self.request_async(None, None, batch=batch))
 
     def clear_batch_results(self):
-        self.batch_results = {}
+        self.batch_results.clear()
 
     def set_batch_results(self, result):
         for r in result:
